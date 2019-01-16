@@ -101,7 +101,7 @@ export default class App extends Component {
               {this.state.data.slice(0).reverse().map((data,key) =>
                 <PostContent key={key} propsKey={key} topic={data.topic} content={data.content} dateNow={data.date} edit={this.editProps} delete={this.deleteProps.bind(this,key)}/>
               )}
-              <PostContent topic="First Topic" content="Hello World!" />
+              {/* <PostContent topic="First Topic" content="Hello World!" /> */}
             </div>
           </div>
         </div>
@@ -117,11 +117,13 @@ class PostContent extends Component {
     this.contentRef = React.createRef();
     this.state = {
       isEdit:false,
+      isCloseProps:false,
       topic: '',
       content: ''
     }
     this.toggleEdit = this.toggleEdit.bind(this);
     this.commitEdit = this.commitEdit.bind(this);
+    this.closeProps = this.closeProps.bind(this);
   }
 
   // show or hide edit form
@@ -164,49 +166,56 @@ class PostContent extends Component {
     })
   }
 
+  closeProps = () => {
+    this.setState({
+      isCloseProps:!this.state.isCloseProps
+    })
+  }
+
   render(){
     const props = this.props;
     const Content = () => {
       return(
         <React.Fragment>
-        <span className="col-12 d-flex justify-content-between">
-          <span>
-            <small>[ {this.numFormat(props.propsKey)} ] </small>
-            <small className="h4">{props.topic ? props.topic : "Add topic here."}</small>
-          </span>
-          <span>
-            <button className="btn btn-white text-primary">Pin</button>
-            <button className="btn btn-white text-primary" onClick={this.toggleEdit}>Edit</button>
-            <button className="btn btn-white text-danger" onClick={props.delete}>Delete</button>
-          </span>
+        <span className="col-12 d-flex justify-content-between align-items-center">
+        <small>[ {this.numFormat(props.propsKey)} ] </small>
+          <small className="h4">{props.topic ? props.topic : "Add topic here."}</small>
+          <button className="btn btn-white btn-sm" onClick={this.closeProps.bind(this)}>close</button>
         </span>
         <span className="col-12 d-flex justify-content-between" style={{minHeight:"8em"}}>
           <textarea disabled value={props.content} className="form-control" style={{resize:"none"}} />
         </span>
-        <span>
+        <span className="col-12 d-flex mb-2">
           <small>{props.dateNow ? props.dateNow : "Example"}</small>
         </span>
+        <span className="col-12 d-flex mb-1 justify-content-end">
+          <span>
+            <button className="btn btn-sm btn-white mr-2" onClick={this.toggleEdit}>Edit</button>
+            <button className="btn btn-sm btn-white text-danger" onClick={props.delete}>Delete</button>
+          </span>
+        </span>
+
         </React.Fragment>
       )
     };
     const EditForm = () => {
       return(
         <React.Fragment>
-        <span className="col-12 mb-2 d-flex justify-content-between form-inline">
+        <span className="col-12 mb-2 d-flex justify-content-between">
           <input className="form-control" defaultValue={props.topic} ref={this.topicRef} />
-          <span>
-            <button className="btn btn-white text-primary" onClick={this.commitEdit} >Commit</button>
-            <button className="btn btn-white text-danger" onClick={this.toggleEdit}>Cancle</button>
-          </span>
         </span>
         <span className="col-12 mb-2 d-flex justify-content-between" style={{minHeight:"8em"}}>
           <textarea defaultValue={props.content} className="form-control"  ref={this.contentRef} style={{resize:"none"}} />
+        </span>
+        <span className="col-12 mb-2 d-flex justify-content-end">
+          <button className="btn btn-sm btn-white mr-2" onClick={this.commitEdit} >Commit</button>
+          <button className="btn btn-sm btn-white" onClick={this.toggleEdit}>Cancle</button>
         </span>
         </React.Fragment>
       )
     }
     return(
-      <div className="row bg-light text-dark mb-3 p-2 rounded">
+      <div className="row bg-light text-dark mb-3 p-2 rounded" style={this.state.isCloseProps ? {display:"none"}:{display:"block"}}>
         {this.state.isEdit ?
           <EditForm />
           :
